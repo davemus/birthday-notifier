@@ -1,5 +1,3 @@
-#!/bin/python3
-
 import datetime
 
 from data import (
