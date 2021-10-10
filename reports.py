@@ -1,34 +1,53 @@
 import os
 import datetime
+from collections import namedtuple
+from database import cursor, connection
 
 
-SUCCESS_REPORT_FILE = 'send_dates'
-ERRORS_REPORT_FILE = 'errors'
+cursor.execute(
+    'CREATE TABLE IF NOT EXISTS reports ('
+        'id SERIAL, '
+        'timestamp TIMESTAMP NOT NULL, '
+        'is_success BOOLEAN NOT NULL, '
+        'message TEXT'
+    ');'
+)
+connection.commit()
+
+
+Report = namedtuple('Report', 'id timestamp is_success message')
 
 
 def emails_have_already_been_sent():
-    try:
-        with open(SUCCESS_REPORT_FILE, 'r') as f:
-            last_line = f.readlines()[-1].rstrip('\n')
-        last_date = datetime.date.fromisoformat(last_line)
-        print(last_date, datetime.date.today())
-        return last_date == datetime.date.today()
-    except Exception as e:
-        print(e)
+    today = datetime.date.today()
+    cursor.execute(
+        'SELECT FROM reports '
+            'WHERE timestamp::date = %s;',
+        (today,)
+    )
+    reports = cursor.fetchall()
+    if not report:
         return False
+    return any(
+        report.is_success for report in
+        map(lambda x: Report(x), reports)
+    )
+
+
+def _write_report(*, is_success, message=''):
+    now = datetime.datetime.now()
+    cursor.execute(
+        'INSERT INTO reports '
+            '(timestamp, is_success, message) '
+            'values (%s, %s, %s);',
+        (now, is_success, message)
+    )
 
 
 def write_report_on_successful_sending():
-    last_date = datetime.date.today().isoformat()
-    try:
-        with open(SUCCESS_REPORT_FILE, 'a') as f:
-            f.write(last_date)
-            f.write('\n')
-    except Exception as e:
-        write_report_on_exception(str(e))
+    _write_report(is_success=True)
 
 
-def write_report_on_exception(text):
-    with open(ERRORS_REPORT_FILE, 'w') as f:
-        f.write(text)
+def write_report_on_exception(message):
+    _write_report(is_success=False, message=message)
 
