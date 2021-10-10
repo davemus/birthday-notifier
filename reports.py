@@ -9,10 +9,12 @@ ERRORS_REPORT_FILE = 'errors'
 def emails_have_already_been_sent():
     try:
         with open(SUCCESS_REPORT_FILE, 'r') as f:
-            last_line = f.readlines()[-1]
+            last_line = f.readlines()[-1].rstrip('\n')
         last_date = datetime.date.fromisoformat(last_line)
+        print(last_date, datetime.date.today())
         return last_date == datetime.date.today()
-    except:
+    except Exception as e:
+        print(e)
         return False
 
 
