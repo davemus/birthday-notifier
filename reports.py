@@ -21,16 +21,16 @@ Report = namedtuple('Report', 'id timestamp is_success message')
 def emails_have_already_been_sent():
     today = datetime.date.today()
     cursor.execute(
-        'SELECT FROM reports '
+        'SELECT * FROM reports '
             'WHERE timestamp::date = %s;',
         (today,)
     )
     reports = cursor.fetchall()
-    if not report:
+    if not reports:
         return False
     return any(
         report.is_success for report in
-        map(lambda x: Report(x), reports)
+        map(lambda x: Report(*x), reports)
     )
 
 
@@ -42,6 +42,7 @@ def _write_report(*, is_success, message=''):
             'values (%s, %s, %s);',
         (now, is_success, message)
     )
+    connection.commit()
 
 
 def write_report_on_successful_sending():

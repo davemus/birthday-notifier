@@ -8,9 +8,9 @@ connection = psycopg2.connect(DATABASE_URL)
 cursor = connection.cursor()
 
 
-def commit_and_cleanup():
+def cleanup():
     cursor.close()
     connection.close()
 
-atexit.register(commit_and_cleanup)
+atexit.register(cleanup)
 
