@@ -4,8 +4,8 @@ from email.mime.text import MIMEText
 from email.header    import Header
 
 
-SENDER = os.environ.get('SMTP_LOGIN')
-PASSWORD = os.environ.get('SMTP_PASSWORD')
+SENDER = os.environ['SMTP_LOGIN']
+PASSWORD = os.environ['SMTP_PASSWORD']
 
 
 def construct_message(addresses, birthdays):
