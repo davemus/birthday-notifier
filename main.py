@@ -12,7 +12,6 @@ from reports import (
 from emails import send_emails
 
 
-
 if __name__ == '__main__':
     try:
         if not emails_have_already_been_sent():
@@ -25,5 +24,5 @@ if __name__ == '__main__':
                 )
             write_report_on_successful_sending()
     except Exception as e:
-        write_report_on_exception(str(e))
+        write_report_on_exception(e)
 

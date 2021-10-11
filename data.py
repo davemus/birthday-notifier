@@ -45,7 +45,7 @@ def retrieve_birthday_people():
     )
     today = date.today()
     return [
-        person for person in people
+        person.full_name for person in people
         if compare_days(person.birthday, today)
     ]
 

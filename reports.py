@@ -49,6 +49,8 @@ def write_report_on_successful_sending():
     _write_report(is_success=True)
 
 
-def write_report_on_exception(message):
-    _write_report(is_success=False, message=message)
+def write_report_on_exception(exception):
+    _write_report(is_success=False, message=str(exception))
+    raise exception
+
 
