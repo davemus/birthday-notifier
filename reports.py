@@ -45,8 +45,17 @@ def _write_report(*, is_success, message=''):
     connection.commit()
 
 
-def write_report_on_successful_sending():
-    _write_report(is_success=True)
+def write_report_on_successful_sending(birthdays_count, notifications_count):
+    if birthdays_count and notifications_count:
+        message = (
+            f'Successfully sent {notifications_count} notification(s) '
+            f'on {birthdays_count} birthday(s)'
+        )
+    elif notifications_count:
+        message = 'No birthdays found for this day'
+    else:
+        message = 'No notification emails configured'
+    _write_report(is_success=True, message=message)
 
 
 def write_report_on_exception(exception):

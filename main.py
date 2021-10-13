@@ -22,7 +22,10 @@ if __name__ == '__main__':
                     notified_people,
                     birthday_boys_and_girls,
                 )
-            write_report_on_successful_sending()
+            write_report_on_successful_sending(
+                len(birthday_boys_and_girls),
+                len(notified_people),
+            )
     except Exception as e:
         write_report_on_exception(e)
 

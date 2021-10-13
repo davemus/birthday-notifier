@@ -14,8 +14,6 @@ def construct_message(addresses, birthdays):
 Это день - день рождения следующих людей:
 
 {birthdays_str}
-
-Не забудьте поздравить!
     """
     msg = MIMEText(plain_text, 'plain', 'utf-8')
     msg['Subject'] = Header('Напоминание о Днях Рождения в Наланде', 'utf-8')
