@@ -5,8 +5,10 @@ from itertools import chain
 from googleapiclient.discovery import build
 
 
-spreadsheet_id = os.environ['GOOGLE_SPREADSHEET_ID']
-birthdays_range = "'Дни рождения'!A2:B1000"
+spreadsheet_birthdays_id = os.environ['GOOGLE_SPREADSHEET_BIRTHDAYS_ID']
+birthdays_range = "B1:C1000"
+
+spreadsheet_emails_id = os.environ['GOOGLE_SPREADSHEET_NOTIFICATION_EMAILS_ID']
 emails_range = "'Получатели нотификаций'!A1:A1000"
 
 
@@ -19,7 +21,7 @@ Person = namedtuple('Person', 'full_name birthday')
 
 def retrieve_email_addresses():
     request = service.spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id,
+        spreadsheetId=spreadsheet_emails_id,
         range=emails_range,
     )
     raw_response = request.execute()
@@ -32,20 +34,25 @@ def compare_days(date1, date2):
 
 def retrieve_birthday_people():
     request = service.spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id,
+        spreadsheetId=spreadsheet_birthdays_id,
         range=birthdays_range,
     )
     raw_response = request.execute()
-    parse_date = lambda datestr: datetime.strptime(datestr, '%d.%m.%Y')
-    people = list(
-        map(
-            lambda x: Person(x[0], parse_date(x[1])),
-            raw_response.get('values', [])
-        )
-    )
+    def parse_row(row):
+        try:
+            return Person(
+                row[0],
+                datetime.strptime(row[1], '%d.%m.%Y'),
+            )
+        except:
+            return None
+    people = [
+        parse_row(row) for row in
+        raw_response.get('values', [])
+    ]
     today = date.today()
     return [
         person.full_name for person in people
-        if compare_days(person.birthday, today)
+        if person is not None and compare_days(person.birthday, today)
     ]
 
