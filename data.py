@@ -19,6 +19,20 @@ service = build('sheets', 'v4', developerKey=API_KEY)
 Person = namedtuple('Person', 'full_name birthday')
 
 
+def parse_time(string_f):
+    """
+    Parses time in row. Time must be in format 'dd.mm.REST...'
+
+    >>> parse_time('28.11.2001')
+    datetime.datetime(2000, 11, 28, 0, 0)
+    >>> parse_time('28.11.xxxx')
+    datetime.datetime(2000, 11, 28, 0, 0)
+    """
+    day, month = [int(part) for part in string_f.split('.')[:2]]
+    placeholder_year = 2000
+    return datetime(day=day, month=month, year=placeholder_year)
+
+
 def retrieve_email_addresses():
     request = service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_emails_id,
@@ -42,7 +56,7 @@ def retrieve_birthday_people():
         try:
             return Person(
                 row[0],
-                datetime.strptime(row[1], '%d.%m.%Y'),
+                parse_time(row[1]),
             )
         except:
             return None
