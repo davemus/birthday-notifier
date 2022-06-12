@@ -1,9 +1,11 @@
 import os
-import smtplib
+import smtplib, ssl
 from email.mime.text import MIMEText
 from email.header    import Header
 
 
+SERVER = os.environ['SMTP_SERVER']
+PORT = os.environ['SMTP_PORT']
 SENDER = os.environ['SMTP_LOGIN']
 PASSWORD = os.environ['SMTP_PASSWORD']
 
@@ -23,8 +25,9 @@ def construct_message(addresses, birthdays):
 
 
 def send_emails(addresses, birthdays):
-    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-    server.ehlo()
+    server = smtplib.SMTP(SERVER, PORT)
+    context = ssl.create_default_context()
+    server.starttls(context=context)
     server.login(SENDER, PASSWORD)
     msg = construct_message(addresses, birthdays)
     server.sendmail(SENDER, addresses, msg.as_string())
