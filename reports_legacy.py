@@ -61,5 +61,3 @@ def write_report_on_successful_sending(birthdays_count, notifications_count):
 def write_report_on_exception(exception):
     _write_report(is_success=False, message=str(exception))
     raise exception
-
-
